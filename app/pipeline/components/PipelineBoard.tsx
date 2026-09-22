@@ -7,7 +7,8 @@ import { useApplicants } from "../hooks/useApplicants";
 import { StageColumn } from "./StageColumn";
 
 export function PipelineBoard() {
-  const { applicants, status, errorMessage, reload } = useApplicants();
+  const { applicants, status, errorMessage, feedback, reload, moveStage } =
+    useApplicants();
   const [nameQuery, setNameQuery] = useState("");
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
 
@@ -65,6 +66,9 @@ export function PipelineBoard() {
           })}
         </div>
       </div>
+      <div aria-live="polite" className="min-h-6 text-sm text-red-500">
+        {feedback}
+      </div>
       {status === "loading" ? (
         <p role="status">불러오는 중...</p>
       ) : status === "error" ? (
@@ -87,6 +91,7 @@ export function PipelineBoard() {
               applicants={filteredApplicants.filter(
                 (applicant) => applicant.stage === stage,
               )}
+              onMoveStage={moveStage}
             />
           ))}
         </div>

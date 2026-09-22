@@ -22,3 +22,12 @@ export const FINAL_RESULT_LABEL: Record<FinalResult, string> = {
   passed: "최종합격",
   rejected: "불합격",
 };
+
+export function getAdjacentStage(
+  stage: PipelineStage,
+  direction: "prev" | "next",
+): PipelineStage | null {
+  const index = PIPELINE_STAGES.indexOf(stage);
+  const nextIndex = direction === "next" ? index + 1 : index - 1;
+  return PIPELINE_STAGES[nextIndex] ?? null;
+}

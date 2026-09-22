@@ -43,6 +43,16 @@ function clone(applicant: Applicant): Applicant {
   return { ...applicant };
 }
 
+export function placeAtStageStart(
+  applicants: Applicant[],
+  moved: Applicant,
+): Applicant[] {
+  const without = applicants.filter((item) => item.id !== moved.id);
+  const insertAt = without.findIndex((item) => item.stage === moved.stage);
+  if (insertAt === -1) return [...without, moved];
+  return [...without.slice(0, insertAt), moved, ...without.slice(insertAt)];
+}
+
 export async function listApplicants(): Promise<Applicant[]> {
   await simulateNetwork();
   return readApplicants().map(clone);
@@ -75,8 +85,7 @@ export async function updateApplicantStage(
     finalResult: stage === "final" ? finalResult : null,
     version: current.version + 1,
   };
-  const next = applicants.slice();
-  next[index] = updated;
+  const next = placeAtStageStart(applicants, updated);
   writeApplicants(next);
   return clone(updated);
 }
