@@ -1,24 +1,70 @@
 "use client";
 
+import { JOBS } from "@/src/api/seed";
 import { PIPELINE_STAGES } from "@/src/api/stages";
+import { useMemo, useState } from "react";
 import { useApplicants } from "../hooks/useApplicants";
 import { StageColumn } from "./StageColumn";
 
 export function PipelineBoard() {
   const { applicants, status, errorMessage, reload } = useApplicants();
+  const [nameQuery, setNameQuery] = useState("");
+  const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
+
+  const filteredApplicants = useMemo(() => {
+    const query = nameQuery.trim().toLowerCase();
+    return applicants.filter((applicant) => {
+      if (query && !applicant.name.toLowerCase().includes(query)) return false;
+      if (selectedJobs.length > 0 && !selectedJobs.includes(applicant.job)) {
+        return false;
+      }
+      return true;
+    });
+  }, [applicants, nameQuery, selectedJobs]);
+
+  function toggleJob(job: string) {
+    setSelectedJobs((current) =>
+      current.includes(job)
+        ? current.filter((item) => item !== job)
+        : [...current, job],
+    );
+  }
 
   return (
     <div className="flex h-screen flex-col gap-4 p-6">
       <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
         채용 파이프라인
       </h1>
-      <label className="flex max-w-md flex-col gap-1 text-sm text-zinc-900 dark:text-zinc-50">
-        검색
-        <input
-          type="text"
-          className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-900"
-        />
-      </label>
+      <div className="flex max-w-3xl flex-col gap-3">
+        <label className="flex max-w-md flex-col gap-1 text-sm text-zinc-900 dark:text-zinc-50">
+          검색
+          <input
+            type="text"
+            value={nameQuery}
+            onChange={(event) => setNameQuery(event.target.value)}
+            className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-900"
+          />
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {JOBS.map((job) => {
+            const selected = selectedJobs.includes(job);
+            return (
+              <button
+                key={job}
+                type="button"
+                onClick={() => toggleJob(job)}
+                className={
+                  selected
+                    ? "h-8 rounded-full border border-white bg-white px-4 text-sm text-zinc-900"
+                    : "h-8 rounded-full border border-zinc-300 bg-transparent px-4 text-sm text-zinc-900 dark:text-zinc-50"
+                }
+              >
+                {job}
+              </button>
+            );
+          })}
+        </div>
+      </div>
       {status === "loading" ? (
         <p role="status">불러오는 중...</p>
       ) : status === "error" ? (
@@ -38,7 +84,7 @@ export function PipelineBoard() {
             <StageColumn
               key={stage}
               stage={stage}
-              applicants={applicants.filter(
+              applicants={filteredApplicants.filter(
                 (applicant) => applicant.stage === stage,
               )}
             />

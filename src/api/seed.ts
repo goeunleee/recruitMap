@@ -3,7 +3,7 @@ import type { Applicant } from "./types";
 
 export const SEED_COUNT = 200;
 
-const JOBS = ["프론트엔드", "백엔드", "디자인", "기획", "데이터", "QA"] as const;
+export const JOBS = ["프론트엔드", "백엔드", "디자인", "기획", "데이터", "QA"] as const;
 const LAST_NAMES = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임"];
 const FIRST_NAMES = [
   "서연",
