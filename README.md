@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## 배포 주소
+
+배포된 보드: [https://goeunleee.github.io/recruitMap/](https://goeunleee.github.io/recruitMap/)
+
+1. 위 링크를 브라우저에서 연다.
+2. 처음이면 레포 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 둔다.
+3. **Actions** 탭에서 `Deploy` 워크플로가 성공(초록)인지 확인한 뒤 다시 연다.
+
+`main`에 푸시하면 GitHub Actions가 다시 배포한다.
+
 ## Getting Started
 
 First, run the development server:
