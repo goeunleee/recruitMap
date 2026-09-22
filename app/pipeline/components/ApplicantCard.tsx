@@ -39,10 +39,20 @@ export function ApplicantCard({
     }
   }
 
+  function handleCardKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === "Enter") {
+      event.preventDefault();
+      onOpenDetail(applicant.id);
+    }
+  }
+
   return (
     <article
+      tabIndex={0}
       aria-label={`${applicant.name}, ${PIPELINE_STAGE_LABEL[applicant.stage]}`}
-      className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900"
+      onKeyDown={handleCardKeyDown}
+      className="rounded-lg border border-zinc-200 bg-white p-3 focus-visible:outline-2 focus-visible:outline-zinc-900 dark:border-zinc-700 dark:bg-zinc-900"
     >
       <button
         type="button"
