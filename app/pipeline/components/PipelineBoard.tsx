@@ -4,6 +4,7 @@ import { JOBS } from "@/src/api/seed";
 import { PIPELINE_STAGES } from "@/src/api/stages";
 import { useMemo, useState } from "react";
 import { useApplicants } from "../hooks/useApplicants";
+import { ApplicantDetailPanel } from "./ApplicantDetailPanel";
 import { StageColumn } from "./StageColumn";
 
 export function PipelineBoard() {
@@ -11,6 +12,9 @@ export function PipelineBoard() {
     useApplicants();
   const [nameQuery, setNameQuery] = useState("");
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selectedApplicant =
+    applicants.find((applicant) => applicant.id === selectedId) ?? null;
 
   const filteredApplicants = useMemo(() => {
     const query = nameQuery.trim().toLowerCase();
@@ -92,10 +96,17 @@ export function PipelineBoard() {
                 (applicant) => applicant.stage === stage,
               )}
               onMoveStage={moveStage}
+              onOpenDetail={setSelectedId}
             />
           ))}
         </div>
       )}
+      {selectedApplicant ? (
+        <ApplicantDetailPanel
+          applicant={selectedApplicant}
+          onClose={() => setSelectedId(null)}
+        />
+      ) : null}
     </div>
   );
 }

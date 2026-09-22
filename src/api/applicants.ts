@@ -32,7 +32,17 @@ function readApplicants(): Applicant[] {
     getStorage().setItem(STORAGE_KEY, JSON.stringify(seeded));
     return seeded;
   }
-  return JSON.parse(raw) as Applicant[];
+  return (JSON.parse(raw) as Applicant[]).map((applicant, index) => {
+    const birthYear = 1988 + (index % 18);
+    const birthMonth = String(((index * 7) % 12) + 1).padStart(2, "0");
+    const birthDay = String(((index * 11) % 28) + 1).padStart(2, "0");
+    return {
+      ...applicant,
+      birthDate:
+        applicant.birthDate ?? `${birthYear}-${birthMonth}-${birthDay}`,
+      gender: applicant.gender ?? (index % 2 === 0 ? "남" : "여"),
+    };
+  });
 }
 
 function writeApplicants(applicants: Applicant[]) {

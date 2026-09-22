@@ -6,6 +6,7 @@ export function StageColumn({
   stage,
   applicants,
   onMoveStage,
+  onOpenDetail,
 }: {
   stage: PipelineStage;
   applicants: Applicant[];
@@ -14,6 +15,7 @@ export function StageColumn({
     direction: "prev" | "next",
     finalResult?: FinalResult | null,
   ) => void;
+  onOpenDetail: (id: string) => void;
 }) {
   return (
     <section className="flex min-h-0 flex-col rounded-lg bg-white">
@@ -26,6 +28,7 @@ export function StageColumn({
             key={applicant.id}
             applicant={applicant}
             onMoveStage={onMoveStage}
+            onOpenDetail={onOpenDetail}
           />
         ))}
       </div>

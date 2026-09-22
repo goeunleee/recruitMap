@@ -32,11 +32,16 @@ export function createSeedApplicants(count = SEED_COUNT): Applicant[] {
     const stage = stageForIndex(index);
     const day = String((index % 28) + 1).padStart(2, "0");
     const month = String((index % 12) + 1).padStart(2, "0");
+    const birthYear = 1988 + (index % 18);
+    const birthMonth = String(((index * 7) % 12) + 1).padStart(2, "0");
+    const birthDay = String(((index * 11) % 28) + 1).padStart(2, "0");
     return {
       id: `app-${index + 1}`,
       name: `${LAST_NAMES[index % LAST_NAMES.length]}${FIRST_NAMES[index % FIRST_NAMES.length]}`,
       job: JOBS[index % JOBS.length],
       appliedAt: `2026-${month}-${day}`,
+      birthDate: `${birthYear}-${birthMonth}-${birthDay}`,
+      gender: index % 2 === 0 ? "남" : "여",
       stage,
       finalResult: finalResultFor(stage, index),
       version: 1,

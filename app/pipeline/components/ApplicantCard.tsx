@@ -12,6 +12,7 @@ import { useState, type KeyboardEvent } from "react";
 export function ApplicantCard({
   applicant,
   onMoveStage,
+  onOpenDetail,
 }: {
   applicant: Applicant;
   onMoveStage: (
@@ -19,6 +20,7 @@ export function ApplicantCard({
     direction: "prev" | "next",
     finalResult?: FinalResult | null,
   ) => void;
+  onOpenDetail: (id: string) => void;
 }) {
   const [finalPick, setFinalPick] = useState<FinalResult | "">("");
   const nextStage = getAdjacentStage(applicant.stage, "next");
@@ -38,21 +40,28 @@ export function ApplicantCard({
       aria-label={`${applicant.name}, ${PIPELINE_STAGE_LABEL[applicant.stage]}`}
       className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900"
     >
-      <p className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
-        {applicant.name}
-      </p>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        {applicant.job}
-      </p>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        지원일 {applicant.appliedAt}
-      </p>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        {PIPELINE_STAGE_LABEL[applicant.stage]}
-        {applicant.stage === "final" && applicant.finalResult
-          ? ` · ${FINAL_RESULT_LABEL[applicant.finalResult]}`
-          : ""}
-      </p>
+      <button
+        type="button"
+        aria-label={`${applicant.name} 상세`}
+        onClick={() => onOpenDetail(applicant.id)}
+        className="w-full text-left"
+      >
+        <p className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+          {applicant.name}
+        </p>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          {applicant.job}
+        </p>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          지원일 {applicant.appliedAt}
+        </p>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          {PIPELINE_STAGE_LABEL[applicant.stage]}
+          {applicant.stage === "final" && applicant.finalResult
+            ? ` · ${FINAL_RESULT_LABEL[applicant.finalResult]}`
+            : ""}
+        </p>
+      </button>
       <div className="mt-3 flex items-center gap-2">
         <button
           type="button"
