@@ -13,6 +13,8 @@ export function ApplicantCard({
   applicant,
   onMoveStage,
   onOpenDetail,
+  canUndo,
+  onUndo,
 }: {
   applicant: Applicant;
   onMoveStage: (
@@ -21,6 +23,8 @@ export function ApplicantCard({
     finalResult?: FinalResult | null,
   ) => void;
   onOpenDetail: (id: string) => void;
+  canUndo: boolean;
+  onUndo: () => void;
 }) {
   const [finalPick, setFinalPick] = useState<FinalResult | "">("");
   const nextStage = getAdjacentStage(applicant.stage, "next");
@@ -105,6 +109,17 @@ export function ApplicantCard({
         >
           →
         </button>
+        {canUndo ? (
+          <button
+            type="button"
+            aria-label="Undo"
+            onClick={onUndo}
+            onKeyDown={handleButtonKeyDown}
+            className="h-8 rounded-md border border-zinc-300 px-3 text-sm text-zinc-900 dark:text-zinc-50"
+          >
+            Undo
+          </button>
+        ) : null}
       </div>
     </article>
   );

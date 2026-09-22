@@ -8,8 +8,16 @@ import { ApplicantDetailPanel } from "./ApplicantDetailPanel";
 import { StageColumn } from "./StageColumn";
 
 export function PipelineBoard() {
-  const { applicants, status, errorMessage, feedback, reload, moveStage } =
-    useApplicants();
+  const {
+    applicants,
+    status,
+    errorMessage,
+    feedback,
+    reload,
+    moveStage,
+    lastMovedId,
+    undoLastMove,
+  } = useApplicants();
   const [nameQuery, setNameQuery] = useState("");
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -97,6 +105,8 @@ export function PipelineBoard() {
               )}
               onMoveStage={moveStage}
               onOpenDetail={setSelectedId}
+              lastMovedId={lastMovedId}
+              onUndo={undoLastMove}
             />
           ))}
         </div>
