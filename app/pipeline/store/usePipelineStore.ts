@@ -1,6 +1,12 @@
 "use client";
 
-import { listApplicants, placeAtStageStart, updateApplicantStage } from "@/src/api/applicants";
+import {
+  listApplicants,
+  placeAtStageStart,
+  saveApplicants,
+  StageConflictError,
+  updateApplicantStage,
+} from "@/src/api/applicants";
 import {
   getAdjacentStage,
   type FinalResult,
@@ -16,12 +22,26 @@ type LastMove = {
   finalResult: FinalResult | null;
 };
 
+export function hasBoardChanges(current: Applicant[], baseline: Applicant[]) {
+  if (current.length !== baseline.length) return true;
+  const savedById = new Map(baseline.map((item) => [item.id, item]));
+  return current.some((item) => {
+    const saved = savedById.get(item.id);
+    return (
+      !saved ||
+      saved.stage !== item.stage ||
+      saved.finalResult !== item.finalResult
+    );
+  });
+}
+
 type PipelineState = {
   applicants: Applicant[];
   status: "loading" | "error" | "ready";
   errorMessage: string | null;
   feedback: string | null;
   lastMove: LastMove | null;
+  baseline: Applicant[];
   nameQuery: string;
   setNameQuery: (nameQuery: string) => void;
   load: () => void;
@@ -31,6 +51,7 @@ type PipelineState = {
     finalResult?: FinalResult | null,
   ) => Promise<void>;
   undoLastMove: () => Promise<void>;
+  refresh: () => Promise<void>;
 };
 
 export const usePipelineStore = create<PipelineState>()(
@@ -41,13 +62,19 @@ export const usePipelineStore = create<PipelineState>()(
       errorMessage: null,
       feedback: null,
       lastMove: null,
+      baseline: [],
       nameQuery: "",
       setNameQuery: (nameQuery) => set({ nameQuery }),
       load: () => {
         set({ status: "loading", errorMessage: null });
         void listApplicants()
           .then((data) => {
-            set({ applicants: data, status: "ready" });
+            set({
+              applicants: data,
+              baseline: data,
+              status: "ready",
+              lastMove: null,
+            });
           })
           .catch(() => {
             set({
@@ -94,12 +121,30 @@ export const usePipelineStore = create<PipelineState>()(
             id,
             nextStage,
             nextFinalResult,
+            current.version,
           );
           set({
             applicants: placeAtStageStart(get().applicants, updated),
             lastMove: previous,
           });
-        } catch {
+        } catch (error) {
+          if (error instanceof StageConflictError) {
+            try {
+              const data = await listApplicants();
+              set({
+                applicants: data,
+                baseline: data,
+                lastMove: null,
+                feedback: error.message,
+              });
+            } catch {
+              set({
+                applicants: snapshotList,
+                feedback: error.message,
+              });
+            }
+            return;
+          }
           set({
             applicants: snapshotList,
             feedback: "단계 이동에 실패했습니다.",
@@ -127,14 +172,44 @@ export const usePipelineStore = create<PipelineState>()(
             lastMove.id,
             lastMove.stage,
             lastMove.finalResult,
+            current.version,
           );
           set({ applicants: placeAtStageStart(get().applicants, updated) });
-        } catch {
+        } catch (error) {
+          if (error instanceof StageConflictError) {
+            try {
+              const data = await listApplicants();
+              set({
+                applicants: data,
+                baseline: data,
+                lastMove: null,
+                feedback: error.message,
+              });
+            } catch {
+              set({
+                applicants: snapshotList,
+                lastMove,
+                feedback: error.message,
+              });
+            }
+            return;
+          }
           set({
             applicants: snapshotList,
             lastMove,
             feedback: "되돌리기에 실패했습니다.",
           });
+        }
+      },
+      refresh: async () => {
+        const { applicants, baseline } = get();
+        if (!hasBoardChanges(applicants, baseline)) return;
+        set({ feedback: null, lastMove: null });
+        try {
+          await saveApplicants(applicants);
+          get().load();
+        } catch {
+          set({ feedback: "저장에 실패했습니다." });
         }
       },
     }),

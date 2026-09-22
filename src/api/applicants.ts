@@ -1,4 +1,4 @@
-import { createSeedApplicants } from "./seed";
+import { createSeedApplicants, SEED_COUNT } from "./seed";
 import type { FinalResult, PipelineStage } from "./stages";
 import type { Applicant } from "./types";
 
@@ -32,7 +32,13 @@ function readApplicants(): Applicant[] {
     getStorage().setItem(STORAGE_KEY, JSON.stringify(seeded));
     return seeded;
   }
-  return (JSON.parse(raw) as Applicant[]).map((applicant, index) => {
+  const parsed = JSON.parse(raw) as Applicant[];
+  if (parsed.length < SEED_COUNT) {
+    const seeded = createSeedApplicants();
+    getStorage().setItem(STORAGE_KEY, JSON.stringify(seeded));
+    return seeded;
+  }
+  return parsed.map((applicant, index) => {
     const birthYear = 1988 + (index % 18);
     const birthMonth = String(((index * 7) % 12) + 1).padStart(2, "0");
     const birthDay = String(((index * 11) % 28) + 1).padStart(2, "0");
@@ -77,10 +83,18 @@ export async function getApplicant(id: string): Promise<Applicant> {
   return clone(found);
 }
 
+export class StageConflictError extends Error {
+  constructor() {
+    super("다른 변경과 충돌했습니다.");
+    this.name = "StageConflictError";
+  }
+}
+
 export async function updateApplicantStage(
   id: string,
   stage: PipelineStage,
   finalResult: FinalResult | null,
+  expectedVersion: number,
 ): Promise<Applicant> {
   await simulateNetwork();
   const applicants = readApplicants();
@@ -89,6 +103,9 @@ export async function updateApplicantStage(
     throw new Error("지원자를 찾을 수 없습니다.");
   }
   const current = applicants[index];
+  if (current.version !== expectedVersion) {
+    throw new StageConflictError();
+  }
   const updated: Applicant = {
     ...current,
     stage,
@@ -98,4 +115,12 @@ export async function updateApplicantStage(
   const next = placeAtStageStart(applicants, updated);
   writeApplicants(next);
   return clone(updated);
+}
+
+export async function saveApplicants(
+  applicants: Applicant[],
+): Promise<Applicant[]> {
+  await simulateNetwork();
+  writeApplicants(applicants.map(clone));
+  return readApplicants().map(clone);
 }
