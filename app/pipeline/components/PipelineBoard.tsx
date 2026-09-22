@@ -17,8 +17,9 @@ export function PipelineBoard() {
     moveStage,
     lastMovedId,
     undoLastMove,
+    nameQuery,
+    setNameQuery,
   } = useApplicants();
-  const [nameQuery, setNameQuery] = useState("");
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedApplicant =
