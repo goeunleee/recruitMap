@@ -1,3 +1,8 @@
+# recruitMap
+
+- 스택: Next.js 16 (App Router), React 19, Tailwind, TypeScript, Zustand
+- Mock API: 서버 없이 `src/api`에서 localStorage로 저장. 호출마다 200–800ms 지연, 약 15% 실패.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## 배포 주소
