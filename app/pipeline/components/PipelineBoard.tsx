@@ -16,7 +16,7 @@ export function PipelineBoard() {
         검색
         <input
           type="text"
-          className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-50"
+          className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-900"
         />
       </label>
       {status === "loading" ? (
