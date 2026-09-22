@@ -17,6 +17,8 @@ export function PipelineBoard() {
     moveStage,
     lastMovedId,
     undoLastMove,
+    refresh,
+    hasChanges,
     nameQuery,
     setNameQuery,
   } = useApplicants();
@@ -100,29 +102,44 @@ export function PipelineBoard() {
             다시 시도
           </button>
         </div>
-      ) : filteredApplicants.length === 0 ? (
-        <p
-          role="status"
-          className="flex min-h-0 flex-1 items-center justify-center"
-        >
-          {emptyMessage}
-        </p>
       ) : (
-        <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
-          {PIPELINE_STAGES.map((stage) => (
-            <StageColumn
-              key={stage}
-              stage={stage}
-              applicants={filteredApplicants.filter(
-                (applicant) => applicant.stage === stage,
-              )}
-              onMoveStage={moveStage}
-              onOpenDetail={setSelectedId}
-              lastMovedId={lastMovedId}
-              onUndo={undoLastMove}
-              emptyMessage={emptyMessage}
-            />
-          ))}
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
+          {hasChanges ? (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => void refresh()}
+                className="h-10 rounded-md border border-zinc-300 px-4 text-sm font-medium dark:border-zinc-600"
+              >
+                Refresh
+              </button>
+            </div>
+          ) : null}
+          {filteredApplicants.length === 0 ? (
+            <p
+              role="status"
+              className="flex min-h-0 flex-1 items-center justify-center"
+            >
+              {emptyMessage}
+            </p>
+          ) : (
+            <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
+              {PIPELINE_STAGES.map((stage) => (
+                <StageColumn
+                  key={stage}
+                  stage={stage}
+                  applicants={filteredApplicants.filter(
+                    (applicant) => applicant.stage === stage,
+                  )}
+                  onMoveStage={moveStage}
+                  onOpenDetail={setSelectedId}
+                  lastMovedId={lastMovedId}
+                  onUndo={undoLastMove}
+                  emptyMessage={emptyMessage}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
       {selectedApplicant ? (

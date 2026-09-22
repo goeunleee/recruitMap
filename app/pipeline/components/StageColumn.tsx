@@ -1,6 +1,16 @@
+"use client";
+
 import { PIPELINE_STAGE_LABEL, type FinalResult, type PipelineStage } from "@/src/api/stages";
 import type { Applicant } from "@/src/api/types";
 import { ApplicantCard } from "./ApplicantCard";
+import { VirtualList } from "./VirtualList";
+
+const CARD_GAP = 8;
+const CARD_SIZE = 167;
+
+function applicantCardSize() {
+  return CARD_SIZE + CARD_GAP;
+}
 
 export function StageColumn({
   stage,
@@ -28,28 +38,23 @@ export function StageColumn({
       <h2 className="p-3 text-base font-semibold text-zinc-900">
         {PIPELINE_STAGE_LABEL[stage]} ({applicants.length})
       </h2>
-      <div
-        className={
-          applicants.length === 0
-            ? "flex min-h-0 flex-1 items-center justify-center p-3 pt-0"
-            : "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3 pt-0"
-        }
-      >
-        {applicants.length === 0 ? (
+      {applicants.length === 0 ? (
+        <div className="flex min-h-0 flex-1 items-center justify-center p-3 pt-0">
           <p className="text-center text-sm text-zinc-600">{emptyMessage}</p>
-        ) : (
-          applicants.map((applicant) => (
+        </div>
+      ) : (
+        <VirtualList items={applicants} itemSize={applicantCardSize}>
+          {(applicant) => (
             <ApplicantCard
-              key={applicant.id}
               applicant={applicant}
               onMoveStage={onMoveStage}
               onOpenDetail={onOpenDetail}
               canUndo={applicant.id === lastMovedId}
               onUndo={onUndo}
             />
-          ))
-        )}
-      </div>
+          )}
+        </VirtualList>
+      )}
     </section>
   );
 }

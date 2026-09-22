@@ -1,7 +1,7 @@
 import { PIPELINE_STAGES, type FinalResult, type PipelineStage } from "./stages";
 import type { Applicant } from "./types";
 
-export const SEED_COUNT = 200;
+export const SEED_COUNT = 1000;
 
 export const JOBS = ["프론트엔드", "백엔드", "디자인", "기획", "데이터", "QA"] as const;
 const LAST_NAMES = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임"];

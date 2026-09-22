@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePipelineStore } from "../store/usePipelineStore";
+import { usePipelineStore, hasBoardChanges } from "../store/usePipelineStore";
 
 export function useApplicants() {
   const applicants = usePipelineStore((state) => state.applicants);
@@ -12,6 +12,10 @@ export function useApplicants() {
   const load = usePipelineStore((state) => state.load);
   const moveStage = usePipelineStore((state) => state.moveStage);
   const undoLastMove = usePipelineStore((state) => state.undoLastMove);
+  const refresh = usePipelineStore((state) => state.refresh);
+  const hasChanges = usePipelineStore((state) =>
+    hasBoardChanges(state.applicants, state.baseline),
+  );
   const nameQuery = usePipelineStore((state) => state.nameQuery);
   const setNameQuery = usePipelineStore((state) => state.setNameQuery);
 
@@ -28,6 +32,8 @@ export function useApplicants() {
     moveStage,
     lastMovedId,
     undoLastMove,
+    refresh,
+    hasChanges,
     nameQuery,
     setNameQuery,
   };
