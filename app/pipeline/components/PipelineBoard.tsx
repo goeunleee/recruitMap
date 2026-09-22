@@ -44,6 +44,11 @@ export function PipelineBoard() {
     );
   }
 
+  const hasFilter = nameQuery.trim() !== "" || selectedJobs.length > 0;
+  const emptyMessage = hasFilter
+    ? "검색 결과가 없습니다."
+    : "지원자가 없습니다.";
+
   return (
     <div className="flex h-screen flex-col gap-4 p-6">
       <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
@@ -95,6 +100,13 @@ export function PipelineBoard() {
             다시 시도
           </button>
         </div>
+      ) : filteredApplicants.length === 0 ? (
+        <p
+          role="status"
+          className="flex min-h-0 flex-1 items-center justify-center"
+        >
+          {emptyMessage}
+        </p>
       ) : (
         <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
           {PIPELINE_STAGES.map((stage) => (
@@ -108,6 +120,7 @@ export function PipelineBoard() {
               onOpenDetail={setSelectedId}
               lastMovedId={lastMovedId}
               onUndo={undoLastMove}
+              emptyMessage={emptyMessage}
             />
           ))}
         </div>
